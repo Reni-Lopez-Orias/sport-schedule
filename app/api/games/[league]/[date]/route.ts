@@ -1,21 +1,54 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 
-const LEAGUE_MAP = {
+const LEAGUE_MAP: { [key: string]: string } = {
   MLB: "baseball/mlb",
   NFL: "football/nfl",
   NBA: "basketball/nba",
 };
 
-const LEAGUE_LOGOS = {
+const LEAGUE_LOGOS: { [key: string]: string } = {
   NFL: "https://a.espncdn.com/i/teamlogos/leagues/500/nfl.png",
   NBA: "https://a.espncdn.com/i/teamlogos/leagues/500/nba.png",
   MLB: "https://a.espncdn.com/i/teamlogos/leagues/500/mlb.png",
 };
 
-export async function GET(req, context) {
-  // 🔹 await context.params
-  const params = await context.params;
+interface ESPNTeam {
+  score: string;
+  team: {
+    logo: string;
+    displayName: string;
+    abbreviation: string;
+  };
+  homeAway: string;
+}
+
+interface ESPNCompetition {
+  competitors: ESPNTeam[];
+  status: {
+    type: {
+      name: string;
+    };
+  };
+  venue?: {
+    fullName: string;
+  };
+}
+
+interface ESPNGame {
+  id: string;
+  date: string;
+  competitions: ESPNCompetition[];
+}
+
+interface ESPNResponse {
+  events: ESPNGame[];
+}
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { league: string; date: string } }
+) {
   const { league, date } = params;
 
   if (!league || !date) {
@@ -35,13 +68,17 @@ export async function GET(req, context) {
   }
 
   try {
-    const url = `https://site.api.espn.com/apis/site/v2/sports/${espnLeague}/scoreboard?dates=${date.replace(/-/g,"")}`;
-    const { data } = await axios.get(url);
+    const url = `https://site.api.espn.com/apis/site/v2/sports/${espnLeague}/scoreboard?dates=${date.replace(/-/g, "")}`;
+    const { data } = await axios.get<ESPNResponse>(url);
 
-    const games = data.events.map(e => {
+    const games = data.events.map((e: ESPNGame) => {
       const comp = e.competitions[0];
-      const home = comp.competitors.find(c => c.homeAway === "home");
-      const away = comp.competitors.find(c => c.homeAway === "away");
+      const home = comp.competitors.find((c: ESPNTeam) => c.homeAway === "home");
+      const away = comp.competitors.find((c: ESPNTeam) => c.homeAway === "away");
+
+      if (!home || !away) {
+        throw new Error("Home or away team not found");
+      }
 
       return {
         id: e.id,

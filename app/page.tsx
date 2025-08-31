@@ -1,25 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import LeagueTabs from "./components/LeagueTabs";
 import LoadingSkeleton from "./components/LoadingSkeleton";
 import NoGames from "./components/NoGames";
 import GamesGrid from "./components/GamesGrid";
+import { GamesData, LeagueLoading } from "./types/interfaces";
 
 const leaguesOrder = ["NFL", "NBA", "MLB"];
 
 export default function Home({ theme }: { theme: "light" | "dark" }) {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [activeLeague, setActiveLeague] = useState("NFL");
-  const [games, setGames] = useState<Record<string, any[]>>({});
-  const [leagueLoading, setLeagueLoading] = useState<Record<string, boolean>>({});
+  const [games, setGames] = useState<GamesData>({});
+  const [leagueLoading, setLeagueLoading] = useState<LeagueLoading>({});
 
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    leaguesOrder.forEach(loadLeagueGames);
-  }, [date, theme]);
-
-  async function loadLeagueGames(league: string) {
+  const loadLeagueGames = useCallback(async (league: string) => {
     setLeagueLoading((prev) => ({ ...prev, [league]: true }));
     try {
       const res = await fetch(`/api/games/${league}/${date}`);
@@ -35,7 +31,12 @@ export default function Home({ theme }: { theme: "light" | "dark" }) {
     } finally {
       setLeagueLoading((prev) => ({ ...prev, [league]: false }));
     }
-  }
+  }, [date]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    leaguesOrder.forEach(loadLeagueGames);
+  }, [date, theme, loadLeagueGames]);
 
   return (
     <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">

@@ -1,8 +1,9 @@
-import Image from "next/image";
 import StatusBadge from "./StatusBadge";
+import { Game } from "../types/interfaces";
+import ImageWithLoading from "./ImageWithLoading";
 
 interface GameCardProps {
-  game: any;
+  game: Game;
 }
 
 export default function GameCard({ game }: GameCardProps) {
@@ -24,7 +25,7 @@ export default function GameCard({ game }: GameCardProps) {
       </div>
       <div className="flex justify-between items-center mt-2">
         <div className="flex flex-col items-center">
-          <Image alt="logo" width={50} height={50} src={game.away.logo} />
+          <ImageWithLoading alt="logo" width={50} height={50} src={game.away.logo} />
           <span className="text-sm font-bold text-center text-gray-900 dark:text-gray-100">
             {game.away.name}
           </span>
@@ -36,7 +37,7 @@ export default function GameCard({ game }: GameCardProps) {
           {game.away.score} - {game.home.score}
         </div>
         <div className="flex flex-col items-center">
-          <Image alt="logo" width={50} height={50} src={game.home.logo} />
+          <ImageWithLoading alt="logo" width={50} height={50} src={game.home.logo} />
           <span className="text-sm font-bold text-center text-gray-900 dark:text-gray-100">
             {game.home.name}
           </span>
