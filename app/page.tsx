@@ -1,6 +1,7 @@
+// app/page.tsx
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import LeagueTabs from "./components/LeagueTabs";
 import LoadingSkeleton from "./components/LoadingSkeleton";
 import NoGames from "./components/NoGames";
@@ -9,7 +10,7 @@ import { GamesData, LeagueLoading } from "./types/interfaces";
 
 const leaguesOrder = ["NFL", "NBA", "MLB"];
 
-export default function Home({ theme }: { theme: "light" | "dark" }) {
+export default function Home() {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [activeLeague, setActiveLeague] = useState("NFL");
   const [games, setGames] = useState<GamesData>({});
@@ -37,20 +38,19 @@ export default function Home({ theme }: { theme: "light" | "dark" }) {
   );
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
     leaguesOrder.forEach(loadLeagueGames);
-  }, [date, theme, loadLeagueGames]);
+  }, [date, loadLeagueGames]);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-      <header className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm">
-        <div className="max-w-6xl mx-auto p-4">
+    <div className="flex flex-col h-screen bg-gray-50 transition-colors duration-300">
+      <header className="sticky top-0 z-10 bg-gray-50 border-b border-gray-200 shadow-sm">
+        <div className="max-w-6xl mx-auto p-3">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full sm:w-auto px-4 py-3 h-[44px] rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-gray-400 focus:ring-2 focus:ring-gray-400 focus:outline-none appearance-none"
+              className="w-full sm:w-auto px-4 py-3 h-[44px] rounded-lg border-2 border-gray-300 bg-white text-gray-900 focus:border-gray-400 focus:ring-2 focus:ring-gray-400 focus:outline-none appearance-none"
             />
 
             <LeagueTabs
@@ -65,9 +65,7 @@ export default function Home({ theme }: { theme: "light" | "dark" }) {
       </header>
 
       <main className="flex-1 overflow-auto pb-20">
-        {" "}
-        {/* ← Añadí pb-20 para espacio al final */}
-        <div className="max-w-6xl mx-auto p-4">
+        <div className="max-w-6xl mx-auto p-3">
           {leagueLoading[activeLeague] && <LoadingSkeleton />}
 
           {!leagueLoading[activeLeague] &&

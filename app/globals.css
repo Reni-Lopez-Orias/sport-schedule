@@ -9,20 +9,11 @@
   --rounded: 0.5rem;
 }
 
-[data-theme="dark"] {
-  --color-bg: #111827;
-  --color-card: #1f2937;
-  --color-text: #f9fafb;
-  --color-border: #374151;
-  --color-accent: #e5e7eb;
-}
-
 body {
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  font-family: system-ui, sans-serif;
   margin: 0;
   padding: 0;
+  color: var(--color-text);
+  background-color: var(--color-bg);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 

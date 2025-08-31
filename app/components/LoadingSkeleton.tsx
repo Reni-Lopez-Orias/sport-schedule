@@ -4,7 +4,7 @@ export default function LoadingSkeleton() {
       {Array.from({ length: 6 }).map((_, i) => (
         <div
           key={i}
-          className="bg-gray-200 dark:bg-gray-700 h-40 rounded-md border border-gray-300 dark:border-gray-600"
+          className="bg-gray-200 h-40 rounded-md border border-gray-300"
         />
       ))}
     </div>
