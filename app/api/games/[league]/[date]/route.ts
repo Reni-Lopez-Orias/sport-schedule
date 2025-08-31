@@ -41,8 +41,62 @@ interface ESPNGame {
   competitions: ESPNCompetition[];
 }
 
+// types/espn.interfaces.ts
+
+export interface ESPNSeason {
+  year: number;
+  startDate: string;
+  endDate: string;
+  type: {
+    id: number;
+    name: string;
+    abbreviation: string;
+  };
+}
+
+export interface ESPNLogo {
+  href: string;
+  width: number;
+  height: number;
+  alt: string;
+  rel: string[];
+  lastUpdated?: string;
+}
+
+export interface ESPNCalendarEvent {
+  label: string;
+  startDate: string;
+  endDate: string;
+  seasonType?: {
+    id: number;
+    name: string;
+    abbreviation: string;
+  };
+}
+
+export interface ESPNLeague {
+  id: string;
+  uid: string;
+  name: string;
+  abbreviation: string;
+  slug: string;
+  season: ESPNSeason;
+  logos: ESPNLogo[];
+  calendarType: "day" | "week" | "month" | "year";
+  calendarIsWhitelist: boolean;
+  calendarStartDate: string;
+  calendarEndDate: string;
+  calendar: ESPNCalendarEvent[];
+}
+
+export interface ESPNLeaguesResponse {
+  leagues: ESPNLeague[];
+  events?: any[]; // Puedes tipar esto más específicamente si necesitas
+}
+
 interface ESPNResponse {
   events: ESPNGame[];
+  leagues: ESPNLeague[];
 }
 
 export async function GET(
@@ -69,13 +123,20 @@ export async function GET(
   }
 
   try {
-    const url = `https://site.api.espn.com/apis/site/v2/sports/${espnLeague}/scoreboard?dates=${date.replace(/-/g, "")}`;
+    const url = `https://site.api.espn.com/apis/site/v2/sports/${espnLeague}/scoreboard?dates=${date.replace(
+      /-/g,
+      ""
+    )}`;
     const { data } = await axios.get<ESPNResponse>(url);
 
     const games = data.events.map((e: ESPNGame) => {
       const comp = e.competitions[0];
-      const home = comp.competitors.find((c: ESPNTeam) => c.homeAway === "home");
-      const away = comp.competitors.find((c: ESPNTeam) => c.homeAway === "away");
+      const home = comp.competitors.find(
+        (c: ESPNTeam) => c.homeAway === "home"
+      );
+      const away = comp.competitors.find(
+        (c: ESPNTeam) => c.homeAway === "away"
+      );
 
       if (!home || !away) {
         throw new Error("Home or away team not found");
@@ -83,6 +144,7 @@ export async function GET(
 
       return {
         id: e.id,
+        league: data.leagues[0].abbreviation,
         status: comp.status.type.name,
         startTimeISO: e.date,
         venue: comp.venue?.fullName || "",
@@ -103,10 +165,18 @@ export async function GET(
 
     return NextResponse.json({
       error: false,
-      data: { date, games, league: leagueUpper, logo: LEAGUE_LOGOS[leagueUpper] || "" },
+      data: {
+        date,
+        games,
+        league: leagueUpper,
+        logo: LEAGUE_LOGOS[leagueUpper] || "",
+      },
     });
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: true, data: "An error has occurred" }, { status: 500 });
+    return NextResponse.json(
+      { error: true, data: "An error has occurred" },
+      { status: 500 }
+    );
   }
 }

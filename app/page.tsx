@@ -54,9 +54,9 @@ export default function Home() {
             />
 
             <LeagueTabs
+              games={games}
               leagues={leaguesOrder}
               activeLeague={activeLeague}
-              games={games}
               leagueLoading={leagueLoading}
               onLeagueChange={setActiveLeague}
             />
@@ -65,7 +65,7 @@ export default function Home() {
       </header>
 
       <main className="flex-1 overflow-auto pb-20">
-        <div className="max-w-6xl mx-auto p-3">
+        <div className="max-w-6xl mx-auto p-4">
           {leagueLoading[activeLeague] && <LoadingSkeleton />}
 
           {!leagueLoading[activeLeague] &&
