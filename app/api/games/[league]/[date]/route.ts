@@ -47,9 +47,10 @@ interface ESPNResponse {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { league: string; date: string } }
+  { params }: { params: Promise<{ league: string; date: string }> }
 ) {
-  const { league, date } = params;
+  // 🔹 AWAIT los parámetros (esto es nuevo en Next.js 15)
+  const { league, date } = await params;
 
   if (!league || !date) {
     return NextResponse.json(
