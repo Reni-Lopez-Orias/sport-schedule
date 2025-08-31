@@ -24,21 +24,25 @@ export default function LeagueTabs({
             className={`flex flex-col items-center justify-center w-full sm:w-24 py-3 rounded-lg border-2 transition-all duration-200 transform
               ${
                 activeLeague === lg
-                  ? "bg-gray-200 dark:bg-gray-600 text-white border-gray-600 dark:border-gray-700 font-bold shadow-lg scale-105"
-                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 opacity-80 hover:opacity-100 hover:border-gray-400 dark:hover:border-gray-400 hover:scale-[1.02]"
+                  ? "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-400 dark:border-gray-600 font-bold shadow-lg scale-105 ring-2 ring-gray-300 dark:ring-gray-500"
+                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 opacity-90 hover:opacity-100 hover:border-gray-400 dark:hover:border-gray-400 hover:scale-[1.02]"
               }`}
           >
             {lg}
             {leagueLoading[lg] && (
               <span className="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4">
-                <div className="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                <div className={`w-3 h-3 border-2 rounded-full animate-spin ${
+                  activeLeague === lg 
+                    ? "border-gray-400 border-t-gray-600 dark:border-gray-500 dark:border-t-gray-300" 
+                    : "border-gray-400 border-t-transparent"
+                }`} />
               </span>
             )}
           </button>
 
-          <span className={`absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm transition-colors
+          <span className={`absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm transition-colors z-10
             ${activeLeague === lg 
-              ? "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-2 border-gray-500" 
+              ? "bg-gray-800 dark:bg-gray-300 text-white dark:text-gray-800 border-2 border-gray-700 dark:border-gray-400 shadow-md" 
               : "bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
             }`}>
             {games[lg]?.length || 0}
