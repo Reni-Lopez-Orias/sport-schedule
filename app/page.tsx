@@ -55,7 +55,7 @@ export default function Home() {
     <div className="flex flex-col h-screen bg-gray-50 transition-colors duration-300">
       <header className="sticky top-0 z-10 bg-gray-50 border-b border-gray-200 shadow-sm">
         <div className="max-w-6xl mx-auto p-3">
-          <div className="flex flex-col sm:flex-row justify-between gap-3">
+          <div className="flex items-center flex-col sm:flex-row justify-between gap-3">
             <input
               id="date"
               name="date"
@@ -81,7 +81,7 @@ export default function Home() {
           {leagueLoading[activeLeague] && <LoadingSkeleton />}
 
           {!leagueLoading[activeLeague] &&
-            games[activeLeague]?.length === 0 && <NoGames />}
+            games[activeLeague]?.length === 0 && <NoGames  leagueName={activeLeague} />}
 
           {!leagueLoading[activeLeague] && games[activeLeague]?.length > 0 && (
             <GamesGrid
