@@ -9,9 +9,10 @@ import GameDetailModal from "./GameDetailModal";
 
 interface GameCardProps {
   game: Game;
+  activeLeague: string;
 }
 
-export default function GameCard({ game }: GameCardProps) {
+export default function GameCard({ game, activeLeague }: GameCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -42,7 +43,7 @@ export default function GameCard({ game }: GameCardProps) {
               height={50}
               src={game.away.logo}
             />
-            <span className="text-sm font-bold text-center text-gray-900">
+            <span className="text-sm font-bold text-center text-gray-900 w-24">
               {game.away.name}
             </span>
             <span className="text-xs opacity-70 font-semibold text-gray-600">
@@ -59,7 +60,7 @@ export default function GameCard({ game }: GameCardProps) {
               height={50}
               src={game.home.logo}
             />
-            <span className="text-sm font-bold text-center text-gray-900">
+            <span className="text-sm font-bold text-center text-gray-900 w-24">
               {game.home.name}
             </span>
             <span className="text-xs opacity-70 font-semibold text-gray-600">
@@ -73,6 +74,7 @@ export default function GameCard({ game }: GameCardProps) {
         game={game}
         gameId={game.id}
         isOpen={isModalOpen}
+        activeLeague={activeLeague}
         onClose={() => setIsModalOpen(false)}
       />
     </>

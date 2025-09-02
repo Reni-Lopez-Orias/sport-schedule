@@ -1,16 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import axios from "axios";
 
 const LEAGUE_MAP: { [key: string]: string } = {
   MLB: "baseball/mlb",
   NFL: "football/nfl",
+  COLLEGEFOOTBALL: "football/college-football",
   NBA: "basketball/nba",
-};
-
-const LEAGUE_LOGOS: { [key: string]: string } = {
-  NFL: "https://a.espncdn.com/i/teamlogos/leagues/500/nfl.png",
-  NBA: "https://a.espncdn.com/i/teamlogos/leagues/500/nba.png",
-  MLB: "https://a.espncdn.com/i/teamlogos/leagues/500/mlb.png",
+  COLLEGEBASKETBALL: "basketball/mens-college-basketball",
+  NHL: "hockey/nhl",
 };
 
 interface ESPNTeam {
@@ -91,7 +87,7 @@ export interface ESPNLeague {
 
 export interface ESPNLeaguesResponse {
   leagues: ESPNLeague[];
-  events?: any[]; // Puedes tipar esto más específicamente si necesitas
+  events?: ESPNGame[]; // Puedes tipar esto más específicamente si necesitas
 }
 
 interface ESPNResponse {
@@ -115,6 +111,10 @@ export async function GET(
 
   const leagueUpper = league.toUpperCase();
   const espnLeague = LEAGUE_MAP[leagueUpper];
+  console.log("liga que llega: ", leagueUpper);
+
+  console.log("liga buscada", espnLeague);
+
   if (!espnLeague) {
     return NextResponse.json(
       { error: true, data: "League not found" },
@@ -127,7 +127,15 @@ export async function GET(
       /-/g,
       ""
     )}`;
-    const { data } = await axios.get<ESPNResponse>(url);
+
+    // Reemplazar axios con fetch
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data: ESPNResponse = await response.json();
 
     const games = data.events.map((e: ESPNGame) => {
       const comp = e.competitions[0];
@@ -144,9 +152,10 @@ export async function GET(
 
       return {
         id: e.id,
-        league: data.leagues[0].abbreviation,
         status: comp.status.type.name,
         startTimeISO: e.date,
+        league: leagueUpper,
+        league_logo: data.leagues[0].logos || "",
         venue: comp.venue?.fullName || "",
         home: {
           score: home.score,
@@ -169,7 +178,7 @@ export async function GET(
         date,
         games,
         league: leagueUpper,
-        logo: LEAGUE_LOGOS[leagueUpper] || "",
+        league_logo: data.leagues[0].logos || "",
       },
     });
   } catch (err) {
