@@ -14,8 +14,8 @@ const LEAGUE_LOGOS: { [key: string]: string } = {
   NBA: "/leagues/nba.png",
   MLB: "/leagues/mlb.png",
   NHL: "/leagues/nhl.png",
-  COLLEGEFOOTBALL: "/leagues/college-football.png",
-  COLLEGEBASKETBALL: "/leagues/college-basketball.png",
+  COLLEGEFOOTBALL: "/leagues/collegefootball.png",
+  COLLEGEBASKETBALL: "/leagues/collegebasketball.png",
 };
 
 export default function LeagueTabs({
