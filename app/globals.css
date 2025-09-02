@@ -58,3 +58,15 @@ button {
 * {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
+
+/* Fix para altura en iOS */
+.ios-height-fix {
+  max-height: 85vh;
+}
+
+@supports (-webkit-touch-callout: none) {
+  .ios-height-fix {
+    max-height: -webkit-fill-available;
+    height: 85vh;
+  }
+}

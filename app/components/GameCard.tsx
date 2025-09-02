@@ -50,9 +50,17 @@ export default function GameCard({ game, activeLeague }: GameCardProps) {
               Away
             </span>
           </div>
-          <div className="text-xl font-bold text-gray-900">
-            {game.away.score} - {game.home.score}
-          </div>
+          {game.status === "STATUS_IN_PROGRESS" ||
+          game.status === "STATUS_HALFTIME" ||
+          game.status === "STATUS_END_PERIOD" ||
+          game.status === "STATUS_FINAL" ? (
+            <div className="text-xl font-bold text-gray-900">
+              {game.away.score} - {game.home.score}
+            </div>
+          ) : (
+            <span className="text-xl font-bold text-gray-800">VS</span>
+          )}
+
           <div className="flex flex-col items-center">
             <ImageWithLoading
               alt="logo"
