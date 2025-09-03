@@ -170,7 +170,6 @@ export default function GameDetailModal({
                   gameDetails={gameDetails}
                   awayTeam={awayTeam}
                   homeTeam={homeTeam}
-                  isLightColor={isLightColor}
                 />
               )}
             </>
