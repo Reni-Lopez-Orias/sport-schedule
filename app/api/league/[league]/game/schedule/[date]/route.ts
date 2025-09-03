@@ -1,76 +1,33 @@
+import {
+  ESPNCalendarEvent,
+  ESPNGame,
+  ESPNLeague,
+  ESPNLogo,
+  ESPNSeason,
+} from "@/app/types/interfaces";
 import { NextRequest, NextResponse } from "next/server";
 
 const LEAGUE_MAP: { [key: string]: string } = {
+  NHL: "hockey/nhl",
   MLB: "baseball/mlb",
   NFL: "football/nfl",
-  COLLEGEFOOTBALL: "football/college-football",
   NBA: "basketball/nba",
+  LALIGA: "soccer/esp.1",
+  SERIEA: "soccer/ita.1",
+  LIGUE1: "soccer/fra.1",
+  BUNDESLIGA: "soccer/ger.1",
+  PREMIERLEAGUE: "soccer/eng.1",
+  CHAMPIONSLEAGUE: "soccer/uefa.champions",
+  COLLEGEFOOTBALL: "football/college-football",
   COLLEGEBASKETBALL: "basketball/mens-college-basketball",
-  NHL: "hockey/nhl",
 };
 
-interface ESPNTeam {
-  score: string;
-  team: {
-    logo: string;
-    displayName: string;
-    abbreviation: string;
-  };
-  homeAway: string;
+export interface ESPNResponse {
+  events: ESPNGame[];
+  leagues: ESPNLeague[];
 }
 
-interface ESPNCompetition {
-  competitors: ESPNTeam[];
-  status: {
-    type: {
-      name: string;
-    };
-  };
-  venue?: {
-    fullName: string;
-  };
-}
-
-interface ESPNGame {
-  id: string;
-  date: string;
-  competitions: ESPNCompetition[];
-}
-
-// types/espn.interfaces.ts
-
-export interface ESPNSeason {
-  year: number;
-  startDate: string;
-  endDate: string;
-  type: {
-    id: number;
-    name: string;
-    abbreviation: string;
-  };
-}
-
-export interface ESPNLogo {
-  href: string;
-  width: number;
-  height: number;
-  alt: string;
-  rel: string[];
-  lastUpdated?: string;
-}
-
-export interface ESPNCalendarEvent {
-  label: string;
-  startDate: string;
-  endDate: string;
-  seasonType?: {
-    id: number;
-    name: string;
-    abbreviation: string;
-  };
-}
-
-export interface ESPNLeague {
+export interface ResponseSportSchedule {
   id: string;
   uid: string;
   name: string;
@@ -83,23 +40,15 @@ export interface ESPNLeague {
   calendarStartDate: string;
   calendarEndDate: string;
   calendar: ESPNCalendarEvent[];
+  games: ESPNGame[];
 }
 
-export interface ESPNLeaguesResponse {
-  leagues: ESPNLeague[];
-  events?: ESPNGame[]; // Puedes tipar esto más específicamente si necesitas
-}
-
-interface ESPNResponse {
-  events: ESPNGame[];
-  leagues: ESPNLeague[];
-}
+//#endregion
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ league: string; date: string }> }
 ) {
-  // 🔹 AWAIT los parámetros (esto es nuevo en Next.js 15)
   const { league, date } = await params;
 
   if (!league || !date) {
@@ -111,9 +60,6 @@ export async function GET(
 
   const leagueUpper = league.toUpperCase();
   const espnLeague = LEAGUE_MAP[leagueUpper];
-  console.log("liga que llega: ", leagueUpper);
-
-  console.log("liga buscada", espnLeague);
 
   if (!espnLeague) {
     return NextResponse.json(
@@ -128,58 +74,35 @@ export async function GET(
       ""
     )}`;
 
-    // Reemplazar axios con fetch
     const response = await fetch(url);
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data: ESPNResponse = await response.json();
+    const games = data.events;
+    const league = data.leagues[0];
 
-    const games = data.events.map((e: ESPNGame) => {
-      const comp = e.competitions[0];
-      const home = comp.competitors.find(
-        (c: ESPNTeam) => c.homeAway === "home"
-      );
-      const away = comp.competitors.find(
-        (c: ESPNTeam) => c.homeAway === "away"
-      );
-
-      if (!home || !away) {
-        throw new Error("Home or away team not found");
-      }
-
-      return {
-        id: e.id,
-        status: comp.status.type.name,
-        startTimeISO: e.date,
-        league: leagueUpper,
-        league_logo: data.leagues[0].logos || "",
-        venue: comp.venue?.fullName || "",
-        home: {
-          score: home.score,
-          logo: home.team.logo || "",
-          name: home.team.displayName,
-          abbr: home.team.abbreviation,
-        },
-        away: {
-          score: away.score,
-          logo: away.team.logo || "",
-          name: away.team.displayName,
-          abbr: away.team.abbreviation,
-        },
-      };
-    });
+    const responseSportSchedule: ResponseSportSchedule = {
+      games: games,
+      id: league.id,
+      uid: league.uid,
+      name: league.name,
+      slug: league.slug,
+      logos: league.logos,
+      season: league.season,
+      calendar: league.calendar,
+      abbreviation: league.abbreviation,
+      calendarType: league.calendarType,
+      calendarEndDate: league.calendarEndDate,
+      calendarStartDate: league.calendarStartDate,
+      calendarIsWhitelist: league.calendarIsWhitelist,
+    };
 
     return NextResponse.json({
       error: false,
-      data: {
-        date,
-        games,
-        league: leagueUpper,
-        league_logo: data.leagues[0].logos || "",
-      },
+      data: responseSportSchedule,
     });
   } catch (err) {
     console.error(err);

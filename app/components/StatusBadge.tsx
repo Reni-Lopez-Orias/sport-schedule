@@ -1,30 +1,30 @@
-export default function StatusBadge({ status }: { status: string }) {
-  const baseClasses =
-    "inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-bold transition";
+interface StatusBadgeProps {
+  status: string;
+}
 
-  if (
-    status === "STATUS_IN_PROGRESS" ||
-    status === "STATUS_HALFTIME" ||
-    status === "STATUS_END_PERIOD"
-  ) {
-    return (
-      <span className={`${baseClasses} bg-green-400 text-white animate-pulse`}>
-        {status === "STATUS_HALFTIME"
-          ? "HALFTIME"
-          : status === "STATUS_END_PERIOD"
-          ? "END QTR"
-          : "LIVE"}
-      </span>
-    );
-  }
+export default function StatusBadge({ status }: StatusBadgeProps) {
+  const getStatusInfo = (status: string) => {
+    switch (status) {
+      case "STATUS_SCHEDULED":
+        return { text: "Scheduled", color: "bg-blue-100 text-blue-800" };
+      case "STATUS_IN_PROGRESS":
+        return { text: "Live", color: "bg-green-100 text-green-800" };
+      case "STATUS_FINAL":
+        return { text: "Final", color: "bg-gray-100 text-gray-800" };
+      case "STATUS_HALFTIME":
+        return { text: "Half", color: "bg-yellow-100 text-yellow-800" };
+      case "STATUS_END_PERIOD":
+        return { text: "End Q", color: "bg-orange-100 text-orange-800" };
+      default:
+        return { text: status, color: "bg-gray-100 text-gray-800" };
+    }
+  };
 
-  if (status === "STATUS_FINAL") {
-    return (
-      <span className={`${baseClasses} bg-red-600 text-white`}>FINAL</span>
-    );
-  }
+  const statusInfo = getStatusInfo(status);
 
   return (
-    <span className={`${baseClasses} bg-blue-500 text-white`}>SCHEDULED</span>
+    <span className={`px-2 py-1 text-xs font-bold rounded-full ${statusInfo.color}`}>
+      {statusInfo.text}
+    </span>
   );
 }

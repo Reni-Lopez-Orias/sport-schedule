@@ -1,19 +1,26 @@
-// app/components/GameCard.tsx
 "use client";
 
 import { useState } from "react";
 import StatusBadge from "./StatusBadge";
-import { Game } from "../types/interfaces";
-import ImageWithLoading from "./ImageWithLoading";
+import { ESPNGame } from "../types/interfaces";
 import GameDetailModal from "./GameDetailModal";
+import ImageWithLoading from "./ImageWithLoading";
 
 interface GameCardProps {
-  game: Game;
+  game: ESPNGame;
   activeLeague: string;
 }
 
 export default function GameCard({ game, activeLeague }: GameCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Obtener equipos desde las competencias
+  const competition = game.competitions?.[0];
+  const awayTeam = competition?.competitors?.find((c) => c.homeAway === "away");
+  const homeTeam = competition?.competitors?.find((c) => c.homeAway === "home");
+
+  // Obtener información del estadio
+  const venue = competition?.venue?.fullName || "Unknown Venue";
 
   return (
     <>
@@ -23,39 +30,38 @@ export default function GameCard({ game, activeLeague }: GameCardProps) {
       >
         <div className="flex items-center gap-2 text-xs mb-2">
           <span className="font-bold text-gray-900">
-            {new Date(game.startTimeISO).toLocaleTimeString([], {
+            {new Date(game.date).toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
             })}
           </span>
           <span className="opacity-70 font-semibold text-gray-700">
-            {game.venue}
+            {venue}
           </span>
           <span className="ml-auto">
-            <StatusBadge status={game.status} />
+            <StatusBadge status={game.status.type.name} />
           </span>
         </div>
         <div className="flex justify-between items-center mt-2">
           <div className="flex flex-col items-center">
             <ImageWithLoading
-              alt="logo"
               width={50}
               height={50}
-              src={game.away.logo}
+              className="object-contain"
+              src={awayTeam?.team.logo || ""}
+              alt={awayTeam?.team.name || "Away team"}
             />
             <span className="text-sm font-bold text-center text-gray-900 w-24">
-              {game.away.name}
+              {awayTeam?.team.name || "Away Team"}
             </span>
             <span className="text-xs opacity-70 font-semibold text-gray-600">
               Away
             </span>
           </div>
-          {game.status === "STATUS_IN_PROGRESS" ||
-          game.status === "STATUS_HALFTIME" ||
-          game.status === "STATUS_END_PERIOD" ||
-          game.status === "STATUS_FINAL" ? (
+
+          {game.status.type.state === "in" || game.status.type.completed ? (
             <div className="text-xl font-bold text-gray-900">
-              {game.away.score} - {game.home.score}
+              {awayTeam?.score} - {homeTeam?.score}
             </div>
           ) : (
             <span className="text-xl font-bold text-gray-800">VS</span>
@@ -63,13 +69,14 @@ export default function GameCard({ game, activeLeague }: GameCardProps) {
 
           <div className="flex flex-col items-center">
             <ImageWithLoading
-              alt="logo"
               width={50}
               height={50}
-              src={game.home.logo}
+              src={homeTeam?.team.logo || ""}
+              className="object-contain"
+              alt={homeTeam?.team.name || "Home team"}
             />
             <span className="text-sm font-bold text-center text-gray-900 w-24">
-              {game.home.name}
+              {homeTeam?.team.name || "Home Team"}
             </span>
             <span className="text-xs opacity-70 font-semibold text-gray-600">
               Home
@@ -80,7 +87,6 @@ export default function GameCard({ game, activeLeague }: GameCardProps) {
 
       <GameDetailModal
         game={game}
-        gameId={game.id}
         isOpen={isModalOpen}
         activeLeague={activeLeague}
         onClose={() => setIsModalOpen(false)}

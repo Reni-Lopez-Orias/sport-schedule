@@ -1,406 +1,458 @@
-// types/interfaces.ts
-export interface Team {
-  score: string;
-  logo: string;
-  name: string;
-  abbr: string;
+export interface BaseResponseSportSchedule<T> {
+  error: boolean;
+  data: T;
 }
 
-export interface Game {
-  id: string;
-  status: string;
-  startTimeISO: string;
-  league: string;
-  league_logo: string;
-  venue: string;
-  home: Team;
-  away: Team;
-}
-
-export interface GamesData {
-  [league: string]: Game[];
-}
-
-export interface LeagueLoading {
-  [league: string]: boolean;
-}
-
-// Agregar estas interfaces nuevas
-export interface ProbablePitcher {
-  id: string;
-  displayName: string;
-  era: string;
-  wins: number;
-  losses: number;
-  strikeouts: number;
-}
-
-export interface OddsInfo {
-  provider: {
-    id: string;
+export interface ESPNSeason {
+  year: number;
+  startDate: string;
+  endDate: string;
+  type: {
+    id: number;
     name: string;
+    abbreviation: string;
   };
+}
+
+export interface BaseLeague {
+  id: string;
+  uid: string;
+  name: string;
+  abbreviation: string;
+  slug: string;
+  season: ESPNSeason;
+  logos: ESPNLogo[];
+  calendarType: "day" | "week" | "month" | "year";
+  calendarIsWhitelist: boolean;
+  calendarStartDate: string;
+  calendarEndDate: string;
+  calendar: ESPNCalendarEvent[];
+  games: ESPNGame[];
+}
+
+// export interface ESPNSeason {
+//   year: number;
+//   type: number;
+//   slug: string;
+// }
+
+export interface ESPNLogo {
+  href: string;
+  width: number;
+  height: number;
+  alt: string;
+  rel: string[];
+  lastUpdated: string;
+}
+
+export interface ESPNCalendarEvent {
+  label: string;
+  startDate: string;
+  endDate: string;
+  seasonType?: {
+    id: number;
+    name: string;
+    abbreviation: string;
+  };
+}
+
+export interface ESPNCompetition {
+  id: string;
+  uid: string;
+  date: string;
+  attendance: number;
+  type: CompetitionType;
+  timeValid: boolean;
+  neutralSite: boolean;
+  conferenceCompetition: boolean;
+  playByPlayAvailable: boolean;
+  recent: boolean;
+  wasSuspended: boolean;
+  venue: Venue;
+  competitors: Competitor[];
+  status: Status;
+  broadcasts: Broadcast[];
+  format: Format;
+  tickets: Ticket[];
+  startDate: string;
+  broadcast: string;
+  geoBroadcasts: GeoBroadcast[];
+  odds: Odds[];
+  headlines: Headline[];
+  // highlights: any[];
+}
+
+interface Format {
+  regulation: Regulation;
+}
+
+interface Regulation {
+  periods: number;
+}
+
+interface Ticket {
+  summary: string;
+  numberAvailable: number;
+  links: TicketLink[];
+}
+
+interface TicketLink {
+  href: string;
+}
+
+interface Market {
+  id: string;
+  type: string;
+}
+
+interface GeoBroadcast {
+  type: GeoBroadcastType;
+  market: Market;
+  media: Media;
+  lang: string;
+  region: string;
+}
+
+interface Media {
+  shortName: string;
+}
+
+// Interfaz para odds/apuestas
+export interface Odds {
+  provider: Provider;
   details: string;
   overUnder: number;
-  moneyLineAway: number;
-  moneyLineHome: number;
+  spread: number;
+  awayTeamOdds: TeamOdds;
+  homeTeamOdds: TeamOdds;
+  links: Link[];
+  featuredBets: FeaturedBet[];
+  moneyline: Moneyline;
+  pointSpread: PointSpread;
+  total: Total;
+  link: Link;
+  header: Header;
 }
 
-export interface ProbabilityInfo {
-  homeWinPercentage: number;
-  awayWinPercentage: number;
-}
-
-export interface SeriesInfo {
-  current: {
-    summary: string;
-    wins: {
-      home: number;
-      away: number;
-    };
-  };
-  season: {
-    summary: string;
-    wins: {
-      home: number;
-      away: number;
-    };
-  };
-}
-
-export interface GameDetail {
-  $ref?: string;
+interface Provider {
   id: string;
-  uid?: string;
+  name: string;
+  priority: number;
+  logos: Logo[];
+}
+
+interface Logo {
+  href: string;
+  rel: string[];
+}
+
+export interface Tags {
+  league: string;
+  sport: string;
+  gameId: number;
+  betSide?: string;
+  betType?: string;
+  betDetails?: string;
+}
+
+export interface TeamReference {
+  id: string;
+}
+
+interface TeamOdds {
+  favorite: boolean;
+  underdog: boolean;
+  moneyLine: number;
+  close: Close;
+  team: TeamReference;
+  favoriteAtOpen: boolean;
+}
+
+interface Close {
+  pointSpread: PointSpreadDetail;
+}
+
+interface PointSpreadDetail {
+  value?: number;
+  alternateDisplayValue: string;
+  decimal?: number;
+  american: string;
+}
+
+interface FeaturedBet {
+  id: string;
+  displayName: string;
+  type: string;
+  odds: string;
+  url: string;
+  startTime: string;
+  payoutText: string;
+  locations?: string[];
+  displayOrder?: number;
+  legCount: number;
+  events: FeaturedBetEvent[];
+}
+
+interface FeaturedBetEvent {
+  displayName: string;
+  legs: Leg[];
+}
+
+interface Leg {
+  marketId: string;
+  marketSelectionId: string;
+  eventId: string;
+  selectionText: string;
+  type: string;
+  startTime: string;
+  marketText: string;
+  icon: string;
+  iconDark: string;
+  url: string;
+  link: Link;
+}
+
+interface Moneyline {
+  displayName: string;
+  shortDisplayName: string;
+  home: MoneylineSide;
+  away: MoneylineSide;
+}
+
+interface MoneylineSide {
+  close: MoneylineClose;
+  open: MoneylineOpen;
+}
+
+// Interfaz para cierre de línea de dinero
+interface MoneylineClose {
+  odds: string;
+  link: Link;
+}
+
+interface MoneylineOpen {
+  odds: string;
+}
+
+interface PointSpread {
+  displayName: string;
+  shortDisplayName: string;
+  home: PointSpreadSide;
+  away: PointSpreadSide;
+}
+
+// Interfaz para lado de spread de puntos
+interface PointSpreadSide {
+  close: PointSpreadClose;
+  open: PointSpreadOpen;
+}
+
+interface PointSpreadClose {
+  line: string;
+  odds: string;
+  link: Link;
+}
+
+// Interfaz para apertura de spread de puntos
+interface PointSpreadOpen {
+  line: string;
+  odds: string;
+}
+
+interface Total {
+  displayName: string;
+  shortDisplayName: string;
+  over: TotalSide;
+  under: TotalSide;
+}
+
+// Interfaz para lado de total
+interface TotalSide {
+  close: TotalClose;
+  open: TotalOpen;
+}
+
+interface TotalClose {
+  line: string;
+  odds: string;
+  link: Link;
+}
+
+// Interfaz para apertura de total
+interface TotalOpen {
+  line: string;
+  odds: string;
+}
+
+// Interfaz para encabezado
+interface Header {
+  logo: HeaderLogo;
+  text: string;
+}
+
+// Interfaz para logo de encabezado
+interface HeaderLogo {
+  dark: string;
+  light: string;
+  exclusivesLogoDark: string;
+  exclusivesLogoLight: string;
+}
+
+// Interfaz para titular
+interface Headline {
+  type: string;
+  description: string;
+  shortLinkText: string;
+}
+
+interface GeoBroadcastType {
+  id: string;
+  shortName: string;
+}
+
+interface Weather {
+  displayValue: string;
+  temperature: number;
+  highTemperature: number;
+  conditionId: string;
+  link: Link;
+}
+
+export interface ESPNGame {
+  id: string;
+  uid: string;
   date: string;
   name: string;
   shortName: string;
-  season?: {
-    $ref: string;
-  };
-  seasonType?: {
-    $ref: string;
-  };
-  timeValid?: boolean;
-  competitions: Array<{
-    $ref?: string;
-    id: string;
-    guid?: string;
-    uid?: string;
-    date: string;
-    timeOfDay?: string;
-    attendance?: number;
-    type?: {
-      id: string;
-      text: string;
-      abbreviation: string;
-      slug: string;
-      type: string;
-    };
-    duration?: {
-      displayValue: string;
-    };
-    necessary?: boolean;
-    timeValid?: boolean;
-    neutralSite?: boolean;
-    divisionCompetition?: boolean;
-    conferenceCompetition?: boolean;
-    previewAvailable?: boolean;
-    recapAvailable?: boolean;
-    boxscoreAvailable?: boolean;
-    lineupAvailable?: boolean;
-    gamecastAvailable?: boolean;
-    playByPlayAvailable?: boolean;
-    conversationAvailable?: boolean;
-    commentaryAvailable?: boolean;
-    pickcenterAvailable?: boolean;
-    summaryAvailable?: boolean;
-    liveAvailable?: boolean;
-    ticketsAvailable?: boolean;
-    shotChartAvailable?: boolean;
-    timeoutsAvailable?: boolean;
-    possessionArrowAvailable?: boolean;
-    onWatchESPN?: boolean;
-    recent?: boolean;
-    wasSuspended?: boolean;
-    bracketAvailable?: boolean;
-    wallclockAvailable?: boolean;
-    highlightsAvailable?: boolean;
-    gameSource?: {
-      id: string;
-      description: string;
-      state: string;
-    };
-    boxscoreSource?: {
-      id: string;
-      description: string;
-      state: string;
-    };
-    playByPlaySource?: {
-      id: string;
-      description: string;
-      state: string;
-    };
-    linescoreSource?: {
-      id: string;
-      description: string;
-      state: string;
-    };
-    statsSource?: {
-      id: string;
-      description: string;
-      state: string;
-    };
-    venue: {
-      fullName: string;
-      address: {
-        city: string;
-        state: string;
-      };
-    };
-    weather?: {
-      $ref: string;
-      type: string;
-      displayValue: string;
-      zipCode: string;
-      lastUpdated: string;
-      windSpeed: number;
-      windDirection: string;
-      temperature: number;
-      highTemperature: number;
-      lowTemperature: number;
-      conditionId: string;
-      gust: number;
-      precipitation: number;
-      link: {
-        language: string;
-        rel: string[];
-        href: string;
-        text: string;
-        shortText: string;
-        isExternal: boolean;
-        isPremium: boolean;
-      };
-    };
-    competitors: Array<{
-      id: string;
-      homeAway: string;
-      score: string;
-      team: {
-        logo: string;
-        name: string;
-        abbreviation: string;
-      };
-      records: Array<{
-        summary: string;
-      }>;
-      probables?: Array<{
-        name: string;
-        displayName: string;
-        shortDisplayName: string;
-        abbreviation: string;
-        playerId: number;
-        athlete: {
-          $ref: string;
-        };
-        statistics: {
-          $ref: string;
-        };
-      }>;
-    }>;
-    // notes?: any[];
-    situation?: {
-      $ref: string;
-    };
-    status: {
-      $ref?: string;
-      type: {
-        name: string;
-        state: string;
-      };
-      period: number;
-      clock: number;
-      displayClock: string;
-    };
-    odds?: {
-      $ref: string;
-    };
-    broadcasts: Array<{
-      names: string[];
-    }>;
-    seriesId?: string;
-    series?: Array<{
-      type: string;
-      title: string;
-      description: string;
-      summary: string;
-      completed: boolean;
-      totalCompetitions: number;
-      competitors: Array<{
-        id: string;
-        uid: string;
-        wins: number;
-        ties: number;
-        team: {
-          $ref: string;
-        };
-      }>;
-      events: Array<{
-        $ref: string;
-      }>;
-      startDate: string;
-    }>;
-    tickets?: {
-      $ref: string;
-    };
-    officials?: {
-      $ref: string;
-    };
-    details?: {
-      $ref: string;
-    };
-    leaders?: {
-      $ref: string;
-    };
-    links?: Array<{
-      language: string;
-      rel: string[];
-      href: string;
-      text: string;
-      shortText: string;
-      isExternal: boolean;
-      isPremium: boolean;
-    }>;
-    predictor?: {
-      $ref: string;
-    };
-    probabilities?: {
-      $ref: string;
-    };
-    dataFormat?: string;
-    powerIndexes?: {
-      $ref: string;
-    };
-    format?: {
-      regulation: {
-        periods: number;
-        displayName: string;
-        slug: string;
-      };
-    };
-  }>;
-  links?: Array<{
-    language: string;
-    rel: string[];
-    href: string;
-    text: string;
-    shortText: string;
-    isExternal: boolean;
-    isPremium: boolean;
-  }>;
-  venues?: Array<{
-    $ref: string;
-  }>;
-  weather?: {
-    $ref: string;
-    type: string;
-    displayValue: string;
-    zipCode: string;
-    lastUpdated: string;
-    windSpeed: number;
-    windDirection: string;
-    temperature: number;
-    highTemperature: number;
-    lowTemperature: number;
-    conditionId: string;
-    gust: number;
-    precipitation: number;
-    link: {
-      language: string;
-      rel: string[];
-      href: string;
-      text: string;
-      shortText: string;
-      isExternal: boolean;
-      isPremium: boolean;
-    };
-  };
-  league?: {
-    $ref: string;
-  };
-  status: {
-    type: {
-      name: string;
-      state: string;
-    };
-    period: number;
-    clock: number;
-    displayClock: string;
-  };
-  // Campos procesados adicionales
-  odds?: OddsInfo[];
-  probabilities?: ProbabilityInfo;
-  probables?: {
-    home: ProbablePitcher;
-    away: ProbablePitcher;
-  };
-  series?: SeriesInfo;
-
-  // boxscore?: any;
-  // leaders?: any;
-  // news?: any;
+  season: ESPNSeason;
+  competitions: ESPNCompetition[];
+  links: Link[];
+  weather: Weather;
+  status: Status;
 }
 
-// Agrega esta interfaz en tus tipos/interfaces.ts o en este mismo archivo
-export interface BettingOdd {
-  provider?: {
-    id: string;
-    name: string;
-  };
-  details: string;
-  overUnder: number;
-  moneyLineAway: number;
-  moneyLineHome: number;
+interface Status {
+  clock: number;
+  displayClock: string;
+  period: number;
+  type: StatusType;
 }
 
-export interface ProbablePitcher {
+export interface Competition {
   id: string;
+  uid: string;
+  date: string;
+  attendance: number;
+  type: CompetitionType;
+  timeValid: boolean;
+  neutralSite: boolean;
+  conferenceCompetition: boolean;
+  playByPlayAvailable: boolean;
+  recent: boolean;
+  wasSuspended: boolean;
+  venue: Venue;
+  competitors: Competitor[];
+  status: GameStatus;
+  broadcasts: Broadcast[];
+  startDate: string;
+}
+
+export interface CompetitionType {
+  id: string;
+  abbreviation: string;
+}
+
+export interface Venue {
+  id: string;
+  fullName: string;
+  address: Address;
+  indoor: boolean;
+}
+
+export interface Address {
+  city: string;
+  state: string;
+}
+
+export interface Competitor {
+  id: string;
+  uid: string;
+  type: string;
+  order: number;
+  homeAway: string;
+  team: Team;
+  score: string;
+  records: Record[];
+}
+
+export interface Team {
+  id: string;
+  uid: string;
+  location: string;
+  name: string;
+  abbreviation: string;
   displayName: string;
-  era: string;
-  wins: number;
-  losses: number;
-  strikeouts: number;
+  shortDisplayName: string;
+  color: string;
+  alternateColor: string;
+  isActive: boolean;
+  logo: string;
 }
 
-export interface OddsInfo {
-  provider: {
-    id: string;
-    name: string;
-  };
-  details: string;
-  overUnder: number;
-  moneyLineAway: number;
-  moneyLineHome: number;
+export interface Record {
+  name: string;
+  abbreviation: string;
+  type: string;
+  summary: string;
 }
 
-export interface ProbabilityInfo {
-  homeWinPercentage: number;
-  awayWinPercentage: number;
+export interface GameStatus {
+  clock: number;
+  displayClock: string;
+  period: number;
+  type: StatusType;
 }
 
-export interface SeriesInfo {
-  current: {
-    summary: string;
-    wins: {
-      home: number;
-      away: number;
-    };
-  };
-  season: {
-    summary: string;
-    wins: {
-      home: number;
-      away: number;
-    };
-  };
+export interface StatusType {
+  id: string;
+  name: string;
+  state: string;
+  completed: boolean;
+  description: string;
+  detail: string;
+  shortDetail: string;
+}
+
+export interface Broadcast {
+  market: string;
+  names: string[];
+}
+
+export interface Link {
+  language: string;
+  rel: string[];
+  href: string;
+  text: string;
+  shortText: string;
+  isExternal: boolean;
+  isPremium: boolean;
+}
+
+export interface LeagueLoading {
+  [key: string]: boolean;
+}
+
+export interface ESPNLeague {
+  id: string;
+  uid: string;
+  name: string;
+  abbreviation: string;
+  slug: string;
+  season: ESPNSeason;
+  logos: ESPNLogo[];
+  calendarType: "day" | "week" | "month" | "year";
+  calendarIsWhitelist: boolean;
+  calendarStartDate: string;
+  calendarEndDate: string;
+  calendar: ESPNCalendarEvent[];
 }

@@ -1,8 +1,8 @@
 import GameCard from "./GameCard";
-import { Game } from "../types/interfaces";
+import { ESPNGame } from "../types/interfaces";
 
 interface GamesGridProps {
-  games: Game[];
+  games: ESPNGame[];
   activeLeague: string;
 }
 
