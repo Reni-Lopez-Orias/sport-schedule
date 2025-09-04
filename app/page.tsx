@@ -104,7 +104,7 @@ export default function Home() {
   const activeLeagueData = leagues[activeLeague];
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50 transition-colors duration-300">
+    <div className="flex flex-col min-h-screen bg-gray-50 transition-colors duration-300">
       <header className="sticky top-0 z-10 bg-gray-50 border-b border-gray-200 shadow-sm">
         <div className="max-w-6xl mx-auto p-3 pb-0">
           <div className="flex items-center flex-col sm:flex-row justify-between gap-1">
@@ -131,7 +131,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="flex-1 overflow-auto pb-20">
+      <main className="flex-1">
         <div className="max-w-6xl mx-auto p-4">
           {leagueLoading[activeLeague] && <LoadingSkeleton />}
 
@@ -153,7 +153,7 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="sticky bottom-0 z-10 flex items-center justify-center gap-2 text-center text-xs text-gray-500 py-1 border-t border-gray-300 bg-gray-50">
+      <footer className="flex items-center justify-center gap-2 text-center text-xs text-gray-500 py-3 border-t bg-gray-50">
         <span className="text-sm font-semibold">Data provided by</span>
         <ImageWithLoading
           width={45}

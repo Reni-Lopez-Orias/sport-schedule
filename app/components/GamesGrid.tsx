@@ -12,7 +12,7 @@ export default function GamesGrid({
   activeLeague,
 }: GamesGridProps) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 pb-6">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {games.map((game) => (
         <GameCard key={game.id} game={game} activeLeague={activeLeague} />
       ))}
