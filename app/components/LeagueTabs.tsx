@@ -1,5 +1,6 @@
 import ImageWithLoading from "./ImageWithLoading";
 import { BaseLeague, LeagueLoading } from "../types/interfaces";
+import { useEffect } from "react";
 
 interface LeagueTabsProps {
   activeLeague: string;
@@ -15,12 +16,19 @@ export default function LeagueTabs({
   onLeagueChange,
 }: LeagueTabsProps) {
   const orderedLeagues = Object.keys(leagues)
-    .filter((abbr) => (leagues[abbr]?.games?.length || 0) > 0) // ✅ mostrar solo si tiene juegos
+    .filter((abbr) => (leagues[abbr]?.games?.length || 0) > 0)
     .sort((a, b) => {
       const gamesA = leagues[a]?.games?.length || 0;
       const gamesB = leagues[b]?.games?.length || 0;
       return gamesB - gamesA;
     });
+
+  // Asegurar que siempre haya una liga activa válida
+  useEffect(() => {
+    if (orderedLeagues.length > 0 && !orderedLeagues.includes(activeLeague)) {
+      onLeagueChange(orderedLeagues[0]);
+    }
+  }, [orderedLeagues, activeLeague, onLeagueChange]);
 
   // Si no hay ligas con juegos, no renderizar nada
   if (orderedLeagues.length === 0) {
@@ -28,7 +36,7 @@ export default function LeagueTabs({
   }
 
   return (
-    <div className="w-full flex flex-row gap-3 items-center overflow-x-auto overflow-y-hidden p-0 h-18 no-vertical-scroll">
+    <div className="p-2 py-0 w-full flex flex-row gap-3 items-center overflow-x-auto overflow-y-hidden h-20 no-vertical-scroll">
       {orderedLeagues.map((leagueAbbr) => {
         const league = leagues[leagueAbbr];
         const gameCount = league?.games?.length || 0;
@@ -40,6 +48,7 @@ export default function LeagueTabs({
             style={{ minWidth: "56px" }}
           >
             <button
+              type="button"
               onClick={() => onLeagueChange(leagueAbbr)}
               className={`w-14 h-14 flex items-center justify-center rounded-full border-2 transition-all duration-200 overflow-hidden
                 ${

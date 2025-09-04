@@ -8,8 +8,8 @@ import {
   Odds,
   Team,
 } from "../types/interfaces";
-import ImageWithLoading from "./ImageWithLoading";
 import StatusBadge from "./StatusBadge";
+import ImageWithLoading from "./ImageWithLoading";
 
 interface GameDetailModalProps {
   game: ESPNGame;
@@ -30,6 +30,7 @@ export default function GameDetailModal({
   const [gameDetails, setGameDetails] = useState<ESPNGame | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("odds");
+  console.log(activeLeague);
 
   useEffect(() => {
     setLoading(true);
@@ -50,17 +51,6 @@ export default function GameDetailModal({
   )?.team;
   const odds = competition?.odds || [];
 
-  // Function to determine if a color is light or dark
-  const isLightColor = (color: string) => {
-    if (!color) return false;
-    const hex = color.replace("#", "");
-    const r = parseInt(hex.substr(0, 2), 16);
-    const g = parseInt(hex.substr(2, 2), 16);
-    const b = parseInt(hex.substr(4, 2), 16);
-    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-    return brightness > 128;
-  };
-
   return (
     <div className="fixed inset-0 backdrop-blur-sm bg-black/50 z-50 flex items-center justify-center p-4">
       <div className="bg-white/95 rounded-xl max-w-4xl w-full h-[85vh] ios-height-fix overflow-hidden shadow-2xl border border-white/20 flex flex-col">
@@ -76,12 +66,6 @@ export default function GameDetailModal({
           }}
         >
           <div className="flex items-center space-x-3">
-            <ImageWithLoading
-              alt="logo"
-              height={40}
-              width={40}
-              src={"/leagues/" + activeLeague.toLowerCase() + ".png"}
-            />
             <h2 className="text-lg font-bold text-white">
               {loading
                 ? "Loading..."
@@ -216,102 +200,126 @@ function OddsTab({
   return (
     <div className="space-y-6">
       {/* Quick betting summary */}
-      <h3 className="font-bold text-lg mb-4 text-gray-900">Betting Summary</h3>
+      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
+        <h3 className="font-bold text-lg mb-4 text-gray-900">
+          Betting Summary
+        </h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Moneyline */}
-        <div
-          className="p-4 rounded-lg"
-          style={{
-            backgroundColor: awayTeam?.color
-              ? `#${awayTeam.color}20`
-              : "#eef2ff",
-            borderLeft: awayTeam?.color
-              ? `4px solid #${awayTeam.color}`
-              : "4px solid #3b82f6",
-          }}
-        >
-          <h4
-            className="font-semibold mb-2"
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Moneyline */}
+          <div
+            className="p-4 rounded-lg"
             style={{
-              color: awayTeam?.color ? `#${awayTeam.color}` : "#1e40af",
+              backgroundColor: awayTeam?.color
+                ? `#${awayTeam.color}20`
+                : "#eef2ff",
+              borderLeft: awayTeam?.color
+                ? `4px solid #${awayTeam.color}`
+                : "4px solid #3b82f6",
             }}
           >
-            Moneyline
-          </h4>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span>{awayTeam?.abbreviation}</span>
-              <span className="font-bold">
-                {primaryOdds.awayTeamOdds.moneyLine > 0 ? "+" : ""}
-                {primaryOdds.awayTeamOdds.moneyLine}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span>{homeTeam?.abbreviation}</span>
-              <span className="font-bold">
-                {primaryOdds.homeTeamOdds.moneyLine > 0 ? "+" : ""}
-                {primaryOdds.homeTeamOdds.moneyLine}
-              </span>
+            <h4
+              className="font-semibold mb-2"
+              style={{
+                color: awayTeam?.color ? `#${awayTeam.color}` : "#1e40af",
+              }}
+            >
+              Moneyline
+            </h4>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <ImageWithLoading
+                  alt="logo"
+                  width={35}
+                  height={35}
+                  src={awayTeam?.logo || ""}
+                />
+                <span className="font-bold">
+                  {primaryOdds.awayTeamOdds.moneyLine > 0 ? "+" : ""}
+                  {primaryOdds.awayTeamOdds.moneyLine}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <ImageWithLoading
+                  alt="logo"
+                  width={35}
+                  height={35}
+                  src={homeTeam?.logo || ""}
+                />
+                <span className="font-bold">
+                  {primaryOdds.homeTeamOdds.moneyLine > 0 ? "+" : ""}
+                  {primaryOdds.homeTeamOdds.moneyLine}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Spread */}
-        <div
-          className="p-4 rounded-lg"
-          style={{
-            backgroundColor: homeTeam?.color
-              ? `#${homeTeam.color}20`
-              : "#f0fdf4",
-            borderLeft: homeTeam?.color
-              ? `4px solid #${homeTeam.color}`
-              : "4px solid #16a34a",
-          }}
-        >
-          <h4
-            className="font-semibold mb-2"
+          {/* Spread */}
+          <div
+            className="p-4 rounded-lg"
             style={{
-              color: homeTeam?.color ? `#${homeTeam.color}` : "#166534",
+              backgroundColor: homeTeam?.color
+                ? `#${homeTeam.color}20`
+                : "#f0fdf4",
+              borderLeft: homeTeam?.color
+                ? `4px solid #${homeTeam.color}`
+                : "4px solid #16a34a",
             }}
           >
-            Spread
-          </h4>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span>{awayTeam?.abbreviation}</span>
-              <span className="font-bold">
-                {primaryOdds.pointSpread.away.close.line} (
-                {primaryOdds.pointSpread.away.close.odds})
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span>{homeTeam?.abbreviation}</span>
-              <span className="font-bold">
-                {primaryOdds.pointSpread.home.close.line} (
-                {primaryOdds.pointSpread.home.close.odds})
-              </span>
+            <h4
+              className="font-semibold mb-2"
+              style={{
+                color: homeTeam?.color ? `#${homeTeam.color}` : "#166534",
+              }}
+            >
+              Spread
+            </h4>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <ImageWithLoading
+                  alt="logo"
+                  width={35}
+                  height={35}
+                  src={awayTeam?.logo || ""}
+                />
+                <span className="font-bold">
+                  {primaryOdds.pointSpread.away.close.line} (
+                  {primaryOdds.pointSpread.away.close.odds})
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <ImageWithLoading
+                  alt="logo"
+                  width={35}
+                  height={35}
+                  src={homeTeam?.logo || ""}
+                />
+                <span className="font-bold">
+                  {primaryOdds.pointSpread.home.close.line} (
+                  {primaryOdds.pointSpread.home.close.odds})
+                </span>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Total */}
-        <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-400">
-          <h4 className="font-semibold text-gray-800 mb-2">Total</h4>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span>Over</span>
-              <span className="font-bold">
-                {primaryOdds.total.over.close.line} (
-                {primaryOdds.total.over.close.odds})
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span>Under</span>
-              <span className="font-bold">
-                {primaryOdds.total.under.close.line} (
-                {primaryOdds.total.under.close.odds})
-              </span>
+          {/* Total */}
+          <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-400">
+            <h4 className="font-semibold text-gray-800 mb-2">Total</h4>
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span className="font-semibold">Over</span>
+                <span className="font-bold">
+                  {primaryOdds.total.over.close.line} (
+                  {primaryOdds.total.over.close.odds})
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-semibold">Under</span>
+                <span className="font-bold">
+                  {primaryOdds.total.under.close.line} (
+                  {primaryOdds.total.under.close.odds})
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -353,21 +361,32 @@ function OddsTab({
               key={index}
               className="border-b border-gray-100 pb-4 last:border-0 last:pb-0"
             >
-              <h4 className="font-medium text-gray-800 mb-2">
-                {odd.provider.name}
-              </h4>
+              <div className="flex justify-center font-medium text-gray-800 mb-2 py-2">
+                <ImageWithLoading
+                  alt="logo"
+                  width={100}
+                  height={100}
+                  src={odd.provider.logos[0]?.href || ""}
+                />
+              </div>
               <div className="grid grid-cols-3 gap-2 text-sm">
-                <div>
-                  <span className="text-gray-600">Moneyline:</span>
-                  <div>{odd.details}</div>
+                <div className="text-center">
+                  <span className="text-gray-600 capitalize font-semibold">
+                    Moneyline
+                  </span>
+                  <div className="text-gray-600 font-bold">{odd.details}</div>
                 </div>
-                <div>
-                  <span className="text-gray-600">Spread:</span>
-                  <div>{odd.spread}</div>
+                <div className="text-center">
+                  <span className="text-gray-600 capitalize font-semibold">
+                    Spread
+                  </span>
+                  <div className="text-gray-600 font-bold">{odd.spread}</div>
                 </div>
-                <div>
-                  <span className="text-gray-600">Total:</span>
-                  <div>{odd.overUnder}</div>
+                <div className="text-center">
+                  <span className="text-gray-600 capitalize font-semibold">
+                    Total
+                  </span>
+                  <div className="text-gray-600 font-bold">{odd.overUnder}</div>
                 </div>
               </div>
             </div>
@@ -433,10 +452,20 @@ function AnalysisTab({
             >
               {awayTeam?.name}
             </h4>
-            <div className="space-y-1 text-sm">
-              <div>Record: {awayRecord}</div>
-              <div>Win percentage: {(awayWinPercentage * 100).toFixed(1)}%</div>
-              <div>Location: {awayTeam?.location}</div>
+            <div className="space-y-1 text-sm flex flex-col">
+              <span className="font-semibold">
+                Record: <span className="ps-1 font-bold">{awayRecord}</span>
+              </span>
+              <span className="font-semibold">
+                Win percentage:
+                <span className="ps-1 font-bold">
+                  {(awayWinPercentage * 100).toFixed(1)}%
+                </span>
+              </span>
+              <span className="font-semibold">
+                Location:
+                <span className="ps-1 font-bold">{awayTeam?.location}</span>
+              </span>
             </div>
           </div>
 
@@ -459,10 +488,20 @@ function AnalysisTab({
             >
               {homeTeam?.name}
             </h4>
-            <div className="space-y-1 text-sm">
-              <div>Record: {homeRecord}</div>
-              <div>Win percentage: {(homeWinPercentage * 100).toFixed(1)}%</div>
-              <div>Location: {homeTeam?.location}</div>
+            <div className="space-y-1 text-sm flex flex-col">
+              <span className="font-semibold">
+                Record: <span className="ps-1 font-bold">{homeRecord}</span>
+              </span>
+              <span className="font-semibold">
+                Win percentage:
+                <span className="ps-1 font-bold">
+                  {(homeWinPercentage * 100).toFixed(1)}%
+                </span>
+              </span>
+              <span className="font-semibold">
+                Location:
+                <span className="ps-1 font-bold">{homeTeam?.location}</span>
+              </span>
             </div>
           </div>
         </div>
@@ -602,7 +641,7 @@ function SummaryTab({
         <div className="grid grid-cols-3 items-center gap-2">
           {/* Away Team */}
           <div
-            className="text-center p-4 rounded-lg"
+            className="text-center p-3 rounded-lg"
             style={{
               backgroundColor: awayTeam?.color
                 ? `#${awayTeam.color}10`
@@ -620,47 +659,50 @@ function SummaryTab({
                 src={awayTeam?.logo || ""}
               />
             </div>
-            <h3 className="font-bold text-gray-900 text-sm">
+            <h3 className="font-bold text-gray-900 text-sm break-words truncate sm:whitespace-normal">
               {awayTeam?.name || "Away Team"}
             </h3>
             <p className="text-xs text-gray-600">{awayTeam?.abbreviation}</p>
           </div>
 
-          {/* Game Status */}
-          <div className="text-center">
-            <div className="bg-gray-100 rounded-lg p-2">
-              {gameDetails.status.clock > 0 ? (
-                <div className="text-xl font-bold text-gray-900">
-                  {activeLeague === "NBA" ||
-                  activeLeague === "COLLEGEBASKETBALL"
-                    ? "Q"
-                    : ""}
-                  {gameDetails.status.period} -{" "}
-                  {gameDetails.status.displayClock}
-                </div>
-              ) : (
-                <div className="text-sm text-gray-600">
-                  {gameDetails.date
-                    ? new Date(gameDetails.date).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        hour12: true,
-                      })
-                    : "Time TBD"}
-                </div>
-              )}
-              {(gameDetails.status.type.state === "in" ||
-                gameDetails.status.type.completed) && (
-                <div className="text-xl font-bold text-gray-700">
-                  {awayScore} - {homeScore}
-                </div>
-              )}
-            </div>
+          <div className="text-center bg-gray-100 rounded-lg p-2">
+            {gameDetails.status.clock > 0 ? (
+              <div className="text-center text-xl font-bold text-gray-900">
+                {activeLeague === "NBA" || activeLeague === "COLLEGEBASKETBALL"
+                  ? "Q"
+                  : ""}
+                {gameDetails.status.period} - {gameDetails.status.displayClock}
+              </div>
+            ) : (
+              <div className="text-center text-sm text-gray-600">
+                {gameDetails.date
+                  ? new Date(gameDetails.date).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: true,
+                    })
+                  : "Time TBD"}
+              </div>
+            )}
+            {gameDetails.status.type.state === "in" ||
+            gameDetails.status.type.completed ? (
+              <div className="text-center text-xl font-bold text-gray-700">
+                {awayScore} - {homeScore}
+              </div>
+            ) : (
+              <span className="text-center text-xl font-bold text-gray-800">
+                VS
+              </span>
+            )}
           </div>
+
+          {/* <div className="text-center">
+          
+          </div> */}
 
           {/* Home Team */}
           <div
-            className="text-center p-4 rounded-lg"
+            className="text-center p-3 rounded-lg"
             style={{
               backgroundColor: homeTeam?.color
                 ? `#${homeTeam.color}10`
@@ -678,7 +720,7 @@ function SummaryTab({
                 src={homeTeam?.logo || ""}
               />
             </div>
-            <h3 className="font-bold text-gray-900 text-sm">
+            <h3 className="font-bold text-gray-900 text-sm break-words truncate sm:whitespace-normal">
               {homeTeam?.name || "Home Team"}
             </h3>
             <p className="text-xs text-gray-600">{homeTeam?.abbreviation}</p>

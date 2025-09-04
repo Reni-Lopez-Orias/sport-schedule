@@ -19,7 +19,6 @@ import ImageWithLoading from "./components/ImageWithLoading";
 const leaguesOrder = [
   "MLB",
   "NBA",
-  "MLB",
   "NHL",
   "COLLEGEFOOTBALL",
   "COLLEGEBASKETBALL",
@@ -37,24 +36,7 @@ export default function Home() {
   const [leagueLoading, setLeagueLoading] = useState<LeagueLoading>({});
   const [leagues, setLeagues] = useState<Record<string, BaseLeague>>({});
   const [isInitialLoading, setIsInitialLoading] = useState(true);
-
-  // Cambiar la liga activa a la que tenga más juegos
-  useEffect(() => {
-    if (Object.keys(leagues).length > 0) {
-      const leagueEntries = Object.values(leagues);
-      let leagueWithMostGames = leagueEntries[0];
-
-      for (let i = 1; i < leagueEntries.length; i++) {
-        if (leagueEntries[i].games.length > leagueWithMostGames.games.length) {
-          leagueWithMostGames = leagueEntries[i];
-        }
-      }
-
-      if (leagueWithMostGames.abbreviation !== activeLeague) {
-        setActiveLeague(leagueWithMostGames.abbreviation);
-      }
-    }
-  }, [leagues, activeLeague]);
+  const [loadedLeaguesCount, setLoadedLeaguesCount] = useState(0);
 
   const loadLeagueGames = useCallback(
     async (leagueAbbr: string) => {
@@ -86,23 +68,45 @@ export default function Home() {
         }));
       } finally {
         setLeagueLoading((prev) => ({ ...prev, [leagueAbbr]: false }));
-        setIsInitialLoading(false);
+        setLoadedLeaguesCount((prev) => prev + 1);
       }
     },
     [date]
   );
 
+  // Efecto para cargar las ligas cuando cambia la fecha
   useEffect(() => {
     setIsInitialLoading(true);
+    setLoadedLeaguesCount(0);
+    setLeagues({});
     leaguesOrder.forEach(loadLeagueGames);
   }, [date, loadLeagueGames]);
+
+  // Efecto para establecer la liga activa inicial
+  useEffect(() => {
+    if (loadedLeaguesCount === leaguesOrder.length && isInitialLoading) {
+      setIsInitialLoading(false);
+
+      // Encontrar la primera liga con juegos
+      const leagueWithGames = leaguesOrder.find(
+        (abbr) => leagues[abbr]?.games?.length > 0
+      );
+
+      if (leagueWithGames) {
+        setActiveLeague(leagueWithGames);
+      } else if (leaguesOrder.length > 0) {
+        // Si no hay juegos, seleccionar la primera liga
+        setActiveLeague(leaguesOrder[0]);
+      }
+    }
+  }, [loadedLeaguesCount, leagues, isInitialLoading]);
 
   const activeLeagueData = leagues[activeLeague];
 
   return (
     <div className="flex flex-col h-screen bg-gray-50 transition-colors duration-300">
       <header className="sticky top-0 z-10 bg-gray-50 border-b border-gray-200 shadow-sm">
-        <div className="max-w-6xl mx-auto p-3">
+        <div className="max-w-6xl mx-auto p-3 pb-0">
           <div className="flex items-center flex-col sm:flex-row justify-between gap-1">
             <input
               id="date"
@@ -141,6 +145,7 @@ export default function Home() {
             activeLeagueData &&
             activeLeagueData.games?.length > 0 && (
               <GamesGrid
+                leagues={leagues}
                 activeLeague={activeLeague}
                 games={activeLeagueData.games}
               />
@@ -148,7 +153,7 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="flex items-center justify-center gap-2 text-center text-xs text-gray-500 py-2 border-t">
+      <footer className="sticky bottom-0 z-10 flex items-center justify-center gap-2 text-center text-xs text-gray-500 py-1 border-t border-gray-300 bg-gray-50">
         <span className="text-sm font-semibold">Data provided by</span>
         <ImageWithLoading
           width={45}
