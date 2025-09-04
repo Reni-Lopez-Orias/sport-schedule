@@ -17,17 +17,18 @@ import { createEmptyLeague } from "./api/helper/helper";
 import ImageWithLoading from "./components/ImageWithLoading";
 
 const leaguesOrder = [
-  "MLB",
-  "NBA",
   "NHL",
-  "COLLEGEFOOTBALL",
-  "COLLEGEBASKETBALL",
-  "CHAMPIONSLEAGUE",
-  "PREMIERLEAGUE",
+  "MLB",
+  "NFL",
+  "NBA",
   "LALIGA",
   "SERIEA",
-  "BUNDESLIGA",
   "LIGUE1",
+  "BUNDESLIGA",
+  "PREMIERLEAGUE",
+  "CHAMPIONSLEAGUE",
+  "COLLEGEFOOTBALL",
+  "COLLEGEBASKETBALL",
 ];
 
 export default function Home() {
@@ -153,7 +154,7 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="flex items-center justify-center gap-2 text-center text-xs text-gray-500 py-3 border-t bg-gray-50">
+      <footer className="flex items-center justify-center gap-2 text-center text-xs text-gray-500 py-3 border-t border-gray-300 bg-gray-50">
         <span className="text-sm font-semibold">Data provided by</span>
         <ImageWithLoading
           width={45}

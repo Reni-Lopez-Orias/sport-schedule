@@ -29,8 +29,8 @@ export default function GameDetailModal({
 }: GameDetailModalProps) {
   const [gameDetails, setGameDetails] = useState<ESPNGame | null>(null);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabType>("odds");
-  console.log(activeLeague);
+  const [activeTab, setActiveTab] = useState<TabType>("summary");
+  console.log(game);
 
   useEffect(() => {
     setLoading(true);
@@ -176,8 +176,8 @@ export default function GameDetailModal({
 // Component for the betting tab
 function OddsTab({
   odds,
-  awayTeam,
-  homeTeam,
+  // awayTeam,
+  // homeTeam,
 }: {
   odds: Odds[];
   awayTeam?: Team;
@@ -194,209 +194,245 @@ function OddsTab({
     );
   }
 
-  // Take odds from the first provider (usually ESPN BET)
-  const primaryOdds = odds[0];
+  // Función para normalizar los datos de apuestas
+  const normalizeOddsData = (odd: Odds) => {
+    // Para proveedores como Bet 365
+    if (odd.awayTeamOdds && odd.homeTeamOdds) {
+      return {
+        provider: odd.provider,
+        moneyline: {
+          away: odd.awayTeamOdds.value || odd.awayTeamOdds.summary,
+          home: odd.homeTeamOdds.value || odd.homeTeamOdds.summary,
+          draw: odd.drawOdds?.value || odd.drawOdds?.summary,
+        },
+        spread: null, // Bet 365 no proporciona spread en este ejemplo
+        total: null, // Bet 365 no proporciona total en este ejemplo
+        details: odd.details,
+      };
+    }
+
+    // Para proveedores como ESPN BET
+    if (odd.moneyline) {
+      return {
+        provider: odd.provider,
+        moneyline: {
+          away: odd.moneyline.away.close?.odds || odd.moneyline.away.open?.odds,
+          home: odd.moneyline.home.close?.odds || odd.moneyline.home.open?.odds,
+          draw: odd.moneyline.draw.close?.odds || odd.moneyline.draw.open?.odds,
+        },
+        spread: {
+          away: odd.pointSpread?.away.close
+            ? `${odd.pointSpread.away.close.line} (${odd.pointSpread.away.close.odds})`
+            : null,
+          home: odd.pointSpread?.home.close
+            ? `${odd.pointSpread.home.close.line} (${odd.pointSpread.home.close.odds})`
+            : null,
+        },
+        total: {
+          over: odd.total?.over.close
+            ? `${odd.total.over.close.line} (${odd.total.over.close.odds})`
+            : null,
+          under: odd.total?.under.close
+            ? `${odd.total.under.close.line} (${odd.total.under.close.odds})`
+            : null,
+        },
+        details: odd.details,
+      };
+    }
+
+    // Para otros formatos
+    return {
+      provider: odd.provider,
+      moneyline: null,
+      spread: null,
+      total: null,
+      details: odd.details,
+    };
+  };
+
+  const normalizedOdds = odds.map(normalizeOddsData);
 
   return (
     <div className="space-y-6">
-      {/* Quick betting summary */}
-      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-        <h3 className="font-bold text-lg mb-4 text-gray-900">
-          Betting Summary
-        </h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Moneyline */}
-          <div
-            className="p-4 rounded-lg"
-            style={{
-              backgroundColor: awayTeam?.color
-                ? `#${awayTeam.color}20`
-                : "#eef2ff",
-              borderLeft: awayTeam?.color
-                ? `4px solid #${awayTeam.color}`
-                : "4px solid #3b82f6",
-            }}
-          >
-            <h4
-              className="font-semibold mb-2"
-              style={{
-                color: awayTeam?.color ? `#${awayTeam.color}` : "#1e40af",
-              }}
-            >
-              Moneyline
-            </h4>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <ImageWithLoading
-                  alt="logo"
-                  width={35}
-                  height={35}
-                  src={awayTeam?.logo || ""}
-                />
-                <span className="font-bold">
-                  {primaryOdds.awayTeamOdds.moneyLine > 0 ? "+" : ""}
-                  {primaryOdds.awayTeamOdds.moneyLine}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <ImageWithLoading
-                  alt="logo"
-                  width={35}
-                  height={35}
-                  src={homeTeam?.logo || ""}
-                />
-                <span className="font-bold">
-                  {primaryOdds.homeTeamOdds.moneyLine > 0 ? "+" : ""}
-                  {primaryOdds.homeTeamOdds.moneyLine}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Spread */}
-          <div
-            className="p-4 rounded-lg"
-            style={{
-              backgroundColor: homeTeam?.color
-                ? `#${homeTeam.color}20`
-                : "#f0fdf4",
-              borderLeft: homeTeam?.color
-                ? `4px solid #${homeTeam.color}`
-                : "4px solid #16a34a",
-            }}
-          >
-            <h4
-              className="font-semibold mb-2"
-              style={{
-                color: homeTeam?.color ? `#${homeTeam.color}` : "#166534",
-              }}
-            >
-              Spread
-            </h4>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <ImageWithLoading
-                  alt="logo"
-                  width={35}
-                  height={35}
-                  src={awayTeam?.logo || ""}
-                />
-                <span className="font-bold">
-                  {primaryOdds.pointSpread.away.close.line} (
-                  {primaryOdds.pointSpread.away.close.odds})
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <ImageWithLoading
-                  alt="logo"
-                  width={35}
-                  height={35}
-                  src={homeTeam?.logo || ""}
-                />
-                <span className="font-bold">
-                  {primaryOdds.pointSpread.home.close.line} (
-                  {primaryOdds.pointSpread.home.close.odds})
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Total */}
-          <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-400">
-            <h4 className="font-semibold text-gray-800 mb-2">Total</h4>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="font-semibold">Over</span>
-                <span className="font-bold">
-                  {primaryOdds.total.over.close.line} (
-                  {primaryOdds.total.over.close.odds})
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-semibold">Under</span>
-                <span className="font-bold">
-                  {primaryOdds.total.under.close.line} (
-                  {primaryOdds.total.under.close.odds})
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Featured bets */}
-      {primaryOdds.featuredBets && primaryOdds.featuredBets.length > 0 && (
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-          <h3 className="font-bold text-lg mb-4 text-gray-900">
-            Featured Bets
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {primaryOdds.featuredBets.slice(0, 4).map((bet, index) => (
-              <div
-                key={index}
-                className="p-4 rounded-lg border-l-4 border-yellow-400 bg-yellow-50"
-              >
-                <h4 className="font-semibold text-yellow-800 mb-2">
-                  {bet.displayName}
-                </h4>
-                <p className="text-lg font-bold text-yellow-600">{bet.odds}</p>
-                <p className="text-sm text-yellow-700 mt-1">{bet.payoutText}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Betting providers */}
+      {/* Proveedores de apuestas */}
       <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
         <h3 className="font-bold text-lg mb-4 text-gray-900">
           Betting Providers
         </h3>
 
         <div className="space-y-4">
-          {odds.map((odd, index) => (
+          {normalizedOdds.map((odd, index) => (
             <div
               key={index}
-              className="border-b border-gray-100 pb-4 last:border-0 last:pb-0"
+              className="border border-gray-200 rounded-lg p-4 bg-gray-50"
             >
-              <div className="flex justify-center font-medium text-gray-800 mb-2 py-2">
-                <ImageWithLoading
-                  alt="logo"
-                  width={100}
-                  height={100}
-                  src={odd.provider.logos[0]?.href || ""}
-                />
+              <div className="flex items-center justify-center font-medium text-gray-800 mb-3">
+                {odd.provider.name}
               </div>
-              <div className="grid grid-cols-3 gap-2 text-sm">
-                <div className="text-center">
-                  <span className="text-gray-600 capitalize font-semibold">
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                {/* Moneyline */}
+                <div className="bg-white p-3 rounded-lg shadow-xs">
+                  <h4 className="font-semibold text-gray-700 mb-2 text-center">
                     Moneyline
-                  </span>
-                  <div className="text-gray-600 font-bold">{odd.details}</div>
+                  </h4>
+                  <div className="space-y-2">
+                    {odd.moneyline ? (
+                      <>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Away:</span>
+                          <span className="font-bold text-gray-800">
+                            {odd.moneyline.away}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Home:</span>
+                          <span className="font-bold text-gray-800">
+                            {odd.moneyline.home}
+                          </span>
+                        </div>
+                        {odd.moneyline.draw && (
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Draw:</span>
+                            <span className="font-bold text-gray-800">
+                              {odd.moneyline.draw}
+                            </span>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <p className="text-gray-500 text-center">
+                        No moneyline data
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <div className="text-center">
-                  <span className="text-gray-600 capitalize font-semibold">
+
+                {/* Spread */}
+                <div className="bg-white p-3 rounded-lg shadow-xs">
+                  <h4 className="font-semibold text-gray-700 mb-2 text-center">
                     Spread
-                  </span>
-                  <div className="text-gray-600 font-bold">{odd.spread}</div>
+                  </h4>
+                  <div className="space-y-2">
+                    {odd.spread ? (
+                      <>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Away:</span>
+                          <span className="font-bold text-gray-800">
+                            {odd.spread.away || "N/A"}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Home:</span>
+                          <span className="font-bold text-gray-800">
+                            {odd.spread.home || "N/A"}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-gray-500 text-center">
+                        No spread data
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <div className="text-center">
-                  <span className="text-gray-600 capitalize font-semibold">
+
+                {/* Total */}
+                <div className="bg-white p-3 rounded-lg shadow-xs">
+                  <h4 className="font-semibold text-gray-700 mb-2 text-center">
                     Total
-                  </span>
-                  <div className="text-gray-600 font-bold">{odd.overUnder}</div>
+                  </h4>
+                  <div className="space-y-2">
+                    {odd.total ? (
+                      <>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Over:</span>
+                          <span className="font-bold text-gray-800">
+                            {odd.total.over || "N/A"}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Under:</span>
+                          <span className="font-bold text-gray-800">
+                            {odd.total.under || "N/A"}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-gray-500 text-center">No total data</p>
+                    )}
+                  </div>
                 </div>
               </div>
+
+              {odd.details && (
+                <div className="mt-3 text-center text-xs text-gray-500">
+                  {odd.details}
+                </div>
+              )}
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Resumen comparativo */}
+      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
+        <h3 className="font-bold text-lg mb-4 text-gray-900">
+          Odds Comparison
+        </h3>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead>
+              <tr>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                  Provider
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                  Away Win
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                  Home Win
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                  Draw
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {normalizedOdds.map((odd, index) => (
+                <tr key={index}>
+                  <td className="px-4 py-2 font-medium">{odd.provider.name}</td>
+                  <td className="px-4 py-2">
+                    {odd.moneyline?.away ? (
+                      <span className="font-bold">{odd.moneyline.away}</span>
+                    ) : (
+                      <span className="text-gray-400">N/A</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-2">
+                    {odd.moneyline?.home ? (
+                      <span className="font-bold">{odd.moneyline.home}</span>
+                    ) : (
+                      <span className="text-gray-400">N/A</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-2">
+                    {odd.moneyline?.draw ? (
+                      <span className="font-bold">{odd.moneyline.draw}</span>
+                    ) : (
+                      <span className="text-gray-400">N/A</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   );
 }
-
 // Component for the analysis tab
 function AnalysisTab({
   gameDetails,

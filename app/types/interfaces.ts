@@ -119,6 +119,7 @@ interface Media {
 
 // Interfaz para odds/apuestas
 export interface Odds {
+  drawOdds: TeamOdds;
   provider: Provider;
   details: string;
   overUnder: number;
@@ -160,6 +161,8 @@ export interface TeamReference {
 }
 
 interface TeamOdds {
+  value: number;
+  summary: string;
   favorite: boolean;
   underdog: boolean;
   moneyLine: number;
@@ -216,6 +219,7 @@ interface Moneyline {
   displayName: string;
   shortDisplayName: string;
   home: MoneylineSide;
+  draw: MoneylineSide;
   away: MoneylineSide;
 }
 
