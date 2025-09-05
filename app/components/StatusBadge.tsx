@@ -10,7 +10,9 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
       case "STATUS_IN_PROGRESS":
         return { text: "Live", color: "bg-green-100 text-green-800" };
       case "STATUS_FINAL":
-        return { text: "Final", color: "bg-gray-100 text-gray-800" };
+        return { text: "Final", color: "bg-red-100 text-red-800" };
+      case "STATUS_FULL_TIME":
+        return { text: "Final", color: "bg-red-100 text-red-800" };
       case "STATUS_HALFTIME":
         return { text: "Half", color: "bg-yellow-100 text-yellow-800" };
       case "STATUS_END_PERIOD":
@@ -23,7 +25,9 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
   const statusInfo = getStatusInfo(status);
 
   return (
-    <span className={`px-2 py-1 text-xs font-bold rounded-full ${statusInfo.color}`}>
+    <span
+      className={`px-2 py-1 text-xs font-bold rounded-full ${statusInfo.color}`}
+    >
       {statusInfo.text}
     </span>
   );

@@ -14,12 +14,10 @@ interface GameCardProps {
 export default function GameCard({ game, activeLeague }: GameCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Obtener equipos desde las competencias
   const competition = game.competitions?.[0];
   const awayTeam = competition?.competitors?.find((c) => c.homeAway === "away");
   const homeTeam = competition?.competitors?.find((c) => c.homeAway === "home");
 
-  // Obtener información del estadio
   const venue = competition?.venue?.fullName || "Unknown Venue";
 
   return (
@@ -64,7 +62,7 @@ export default function GameCard({ game, activeLeague }: GameCardProps) {
               {awayTeam?.score} - {homeTeam?.score}
             </div>
           ) : (
-            <span className="text-xl font-bold text-gray-800">VS</span>
+            <span className="text-xl font-bold text-gray-800">@</span>
           )}
 
           <div className="flex flex-col items-center">

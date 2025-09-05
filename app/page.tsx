@@ -75,7 +75,6 @@ export default function Home() {
     [date]
   );
 
-  // Efecto para cargar las ligas cuando cambia la fecha
   useEffect(() => {
     setIsInitialLoading(true);
     setLoadedLeaguesCount(0);
@@ -83,12 +82,10 @@ export default function Home() {
     leaguesOrder.forEach(loadLeagueGames);
   }, [date, loadLeagueGames]);
 
-  // Efecto para establecer la liga activa inicial
   useEffect(() => {
     if (loadedLeaguesCount === leaguesOrder.length && isInitialLoading) {
       setIsInitialLoading(false);
 
-      // Encontrar la primera liga con juegos
       const leagueWithGames = leaguesOrder.find(
         (abbr) => leagues[abbr]?.games?.length > 0
       );
@@ -96,7 +93,6 @@ export default function Home() {
       if (leagueWithGames) {
         setActiveLeague(leagueWithGames);
       } else if (leaguesOrder.length > 0) {
-        // Si no hay juegos, seleccionar la primera liga
         setActiveLeague(leaguesOrder[0]);
       }
     }
@@ -107,17 +103,8 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 transition-colors duration-300">
       <header className="sticky top-0 z-10 bg-gray-50 border-b border-gray-200 shadow-sm">
-        <div className="max-w-6xl mx-auto p-3 pb-0">
+        <div className="max-w-6xl mx-auto p-3">
           <div className="flex items-center flex-col sm:flex-row justify-between gap-1">
-            <input
-              id="date"
-              name="date"
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full sm:w-auto px-4 py-3 h-[44px] rounded-lg border-2 border-gray-300 bg-white text-gray-900 focus:border-gray-400 focus:ring-2 focus:ring-gray-400 focus:outline-none appearance-none"
-            />
-
             {isInitialLoading ? (
               <LeagueTabsSkeleton />
             ) : (
@@ -128,6 +115,15 @@ export default function Home() {
                 onLeagueChange={setActiveLeague}
               />
             )}
+
+            <input
+              id="date"
+              name="date"
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full sm:w-auto px-4 py-3 h-[44px] rounded-lg border-2 border-gray-300 bg-white text-gray-900 focus:border-gray-400 focus:ring-2 focus:ring-gray-400 focus:outline-none appearance-none"
+            />
           </div>
         </div>
       </header>
@@ -154,7 +150,7 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="flex items-center justify-center gap-2 text-center text-xs text-gray-500 py-3 border-t border-gray-300 bg-gray-50">
+      <footer className="flex items-center justify-center gap-2 text-center text-xs text-gray-500 py-1 border-t border-gray-200 bg-gray-50">
         <span className="text-sm font-semibold">Data provided by</span>
         <ImageWithLoading
           width={45}

@@ -11,7 +11,6 @@ export function LoadingSkeleton() {
   );
 }
 
-// LeagueTabsSkeleton.tsx
 export function LeagueTabsSkeleton() {
   return (
     <div className="w-full flex flex-row gap-3 items-center overflow-x-auto overflow-y-hidden p-0 h-18 no-vertical-scroll">

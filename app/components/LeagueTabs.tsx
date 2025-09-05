@@ -1,6 +1,6 @@
+import { useEffect } from "react";
 import ImageWithLoading from "./ImageWithLoading";
 import { BaseLeague, LeagueLoading } from "../types/interfaces";
-import { useEffect } from "react";
 
 interface LeagueTabsProps {
   activeLeague: string;
@@ -16,21 +16,19 @@ export default function LeagueTabs({
   onLeagueChange,
 }: LeagueTabsProps) {
   const orderedLeagues = Object.keys(leagues)
-    .filter((abbr) => (leagues[abbr]?.games?.length || 0) > 0) // ✅ mostrar solo si tiene juegos
+    .filter((abbr) => (leagues[abbr]?.games?.length || 0) > 0)
     .sort((a, b) => {
       const gamesA = leagues[a]?.games?.length || 0;
       const gamesB = leagues[b]?.games?.length || 0;
       return gamesB - gamesA;
     });
 
-  // En LeagueTabs, asegúrate de que siempre haya una liga activa
   useEffect(() => {
     if (orderedLeagues.length > 0 && !orderedLeagues.includes(activeLeague)) {
       onLeagueChange(orderedLeagues[0]);
     }
-  }, [orderedLeagues, activeLeague,onLeagueChange]);
+  }, [orderedLeagues, activeLeague, onLeagueChange]);
 
-  // Si no hay ligas con juegos, no renderizar nada
   if (orderedLeagues.length === 0) {
     return null;
   }
